@@ -1,20 +1,15 @@
-# Node Basics - File Operations
+# Mini-Project 3: Advanced RESTful API
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/df7d557610ea4dfcb364/maintainability)](https://codeclimate.com/github/Evangre/Project1NodeBasics/maintainability)
+## Features:
 
-A simple CLI tool for performing basic file operations like reading, writing, and deleting files using Node.js.
+- Advanced RESTful API design with filtering and sorting.
+- API Versioning using URL.
+- Query Parameters for filtering data.
+- Pagination using `page` and `limit` parameters.
+- Proper Error Handling.
 
-## Usage
+## How to run:
 
-1. Ensure you have Node.js installed.
-2. Clone the repository.
-3. Navigate to the project directory in the terminal.
-4. Use the following commands:
-
-   - Read a file: `node fileOperations.js read <filename>`
-   - Write to a file: `node fileOperations.js write <filename> <content>`
-   - Delete a file: `node fileOperations.js delete <filename>`
-
-## Disclaimer
-
-Use the delete operation with caution as it will permanently delete the file.
+1. Start the server using `node server.js`.
+2. Access the API at `http://localhost:3000/v1/api/users`.
+3. Use query parameters like `?name=John&page=1&limit=2`.
