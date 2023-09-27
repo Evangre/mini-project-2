@@ -1,5 +1,7 @@
 # Mini-Project 3: Advanced RESTful API
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/df7d557610ea4dfcb364/maintainability)](https://codeclimate.com/github/Evangre/Project1NodeBasics/maintainability)
+
 ## Features:
 
 - Advanced RESTful API design with filtering and sorting.
