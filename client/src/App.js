@@ -1,22 +1,14 @@
 import React from "react";
-import { useFetchUsers } from "./useFetchUsers";
+import AddUserComponent from "./AddUserComponent";
+import UsersComponent from "./UsersComponent";
 
-const App = () => {
-  const { users, loading, fetchUsers } = useFetchUsers();
-
+function App() {
   return (
     <div>
-      <h1>User List</h1>
-      <button onClick={fetchUsers}>Refresh</button>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>{user.name}</li>
-          ))}
-        </ul>
-      )}
+      <AddUserComponent />
+      <UsersComponent />
     </div>
   );
-};
+}
+
+export default App;
