@@ -36,7 +36,7 @@
    node server.js
    ```
 
-Access the API at `http://localhost:3000/api/users`.
+Access the API at `http://localhost:3001/api/users`.
 
 ### Frontend:
 
