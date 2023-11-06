@@ -1,43 +1,48 @@
-const http = require("http");
-const fs = require("fs").promises;
-const path = require("path");
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 
-// Async function for handling HTTP requests
-const requestHandler = async (req, res) => {
+const app = express();
+app.use(cors()); 
+app.use(bodyParser.json());
+
+mongoose.connect("mongodb://localhost:27017/evansDatabase", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function () {
+  console.log("Connected to MongoDB");
+});
+
+const userSchema = new mongoose.Schema({
+  name: String,
+});
+
+const User = mongoose.model("User", userSchema);
+
+app.get("/api/users", async (req, res) => {
   try {
-    if (req.method === "GET" && req.url === "/api/users") {
-      // Read user data from a file using Promises and async/await
-      const data = await fs.readFile(
-        path.join(__dirname, "users.json"),
-        "utf8"
-      );
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(data);
-    } else {
-      res.writeHead(404, { "Content-Type": "text/plain" });
-      res.end("Not Found");
-    }
+    const users = await User.find();
+    res.json(users);
   } catch (error) {
-    res.writeHead(500, { "Content-Type": "text/plain" });
-    res.end("Internal Server Error");
+    res.status(500).send(error);
   }
-};
+});
 
-// Create an HTTP server using the http module and async function
-const server = http.createServer(requestHandler);
+app.post("/api/users", async (req, res) => {
+  try {
+    const newUser = new User({ name: req.body.name });
+    await newUser.save();
+    res.json(newUser);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
-// Function to simulate delay using callback
-const delay = (duration, callback) => {
-  setTimeout(() => {
-    console.log(`Waited for ${duration} milliseconds.`);
-    callback();
-  }, duration);
-};
-
-// Start the server on port 3000
-server.listen(3000, () => {
-  console.log("Server running on <http://localhost:3000/>");
-  delay(2000, () => {
-    console.log("This message comes after a 2-second delay using callbacks.");
-  });
+app.listen(3001, () => {
+  console.log("Server running on <http://localhost:3001/>");
 });
