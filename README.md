@@ -1,28 +1,23 @@
-# Mini-Project 7: MongoDB Basics
+# Mini-Project 8: Mongoose
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/df7d557610ea4dfcb364/maintainability)](https://codeclimate.com/github/Evangre/Project1NodeBasics/maintainability)
 
 ## Features:
 
-- **MongoDB Integration**:
-  - Added MongoDB as a data storage for the application, replacing the previous file-based storage system.
-- **Mongosh and MongoDB Compass**:
-  - Introduced tools for MongoDB interactions and data manipulation.
-- **Mongoose ODM**:
-  - Utilized Mongoose for object data modeling to simplify interactions with MongoDB.
-- **New Collections and Documents**:
-  - Created new collections and documents within MongoDB to store user data.
-- **Updated API Endpoints**:
-  - The Express backend now includes API endpoints to interact with MongoDB for data retrieval and storage.
+- **Mongoose Integration**: Utilizes Mongoose for MongoDB object data modeling, providing a schema-based solution to model application data.
+- **CRUD Operations**: Implements routes to support CRUD operations for workouts, nutrition facts, and goals.
+- **Validation**: Adds validation on routes using Mongoose and Express-Validator to ensure accurate and secure data entry.
+- **Data Modeling**: Models for user data, workouts, nutrition facts, and goals have been defined using Mongoose schemas.
 
 ## How to run:
 
 ### MongoDB:
 
-- Ensure MongoDB is running on your machine:
-  ```shell
-  brew services start mongodb-community@7.0
-  ```
+Ensure MongoDB is running on your machine:
+
+````shell
+brew services start mongodb-community@7.0
+
 
 ### Backend:
 
@@ -30,7 +25,8 @@
 2. Install dependencies (if not done previously):
    ```shell
    npm install
-   ```
+````
+
 3. Start the server using the command:
    ```shell
    node server.js
