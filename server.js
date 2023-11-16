@@ -21,7 +21,7 @@ db.once("open", function () {
 // Existing User Schema
 const userSchema = new mongoose.Schema({
   name: String,
-  // Add any new fields you need for your project
+  
 });
 const User = mongoose.model("User", userSchema);
 
