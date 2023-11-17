@@ -1,60 +1,25 @@
+// RegisterComponent.js
 import React, { useState } from "react";
+import { useFormInput } from "./useFormInput";
+import FormField from "./FormField";
 
-function RegisterComponent() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const RegisterComponent = () => {
+  const username = useFormInput("");
+  const password = useFormInput("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
-    setMessage("");
-
-    try {
-      const response = await fetch("/api/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: username, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setMessage(result.message);
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   return (
     <div>
       <h1>Register</h1>
       <form onSubmit={handleSubmit}>
-        <label>
-          Username:
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={submitting}
-          />
-        </label>
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={submitting}
-          />
-        </label>
+        <FormField label="Username" type="text" {...username} />
+        <FormField label="Password" type="password" {...password} />
         <button type="submit" disabled={submitting}>
           Register
         </button>
@@ -62,6 +27,6 @@ function RegisterComponent() {
       {message && <p>{message}</p>}
     </div>
   );
-}
+};
 
 export default RegisterComponent;
