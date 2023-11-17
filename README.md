@@ -1,15 +1,24 @@
-# Mini-Project 8: Mongoose
+# Mini-Project 9: Identity Management and Encryption
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/df7d557610ea4dfcb364/maintainability)](https://codeclimate.com/github/Evangre/Project1NodeBasics/maintainability)
 
 ## Features:
 
-- **Mongoose Integration**: Utilizes Mongoose for MongoDB object data modeling, providing a schema-based solution to model application data.
-- **CRUD Operations**: Implements routes to support CRUD operations for workouts, nutrition facts, and goals.
-- **Validation**: Adds validation on routes using Mongoose and Express-Validator to ensure accurate and secure data entry.
-- **Data Modeling**: Models for user data, workouts, nutrition facts, and goals have been defined using Mongoose schemas.
+- **User Authentication**: Implements user registration, login, and logout using Passport.js.
+- **Password Hashing and Salting**: Enhances security by hashing and salting passwords using Bcrypt.js.
+- **Session Management**: Manages user sessions using `express-session` for a seamless user experience.
+- **Mongoose Integration**: Continues to utilize Mongoose for MongoDB object data modeling.
+- **CRUD Operations**: Maintains CRUD operations for workouts, nutrition facts, and goals.
+- **Validation**: Preserves validation on routes using Mongoose and Express-Validator.
 
-## How to run:
+## How to Run:
+
+### Environment Setup:
+
+Create a `.env` file in the root directory with the following content (replace `<Your_Secret_Key>` with your actual secret key):
+
+`````env
+SESSION_SECRET=<Your_Secret_Key>
 
 ### MongoDB:
 
@@ -25,7 +34,7 @@ brew services start mongodb-community@7.0
 2. Install dependencies (if not done previously):
    ```shell
    npm install
-````
+`````
 
 3. Start the server using the command:
    ```shell
