@@ -1,23 +1,27 @@
-// RegisterComponent.js
-import React, { useState } from "react";
-import { useFormInput } from "./useFormInput";
+import React from "react";
+import { useFormInput } from "../hooks/useFormInput";
+import { useSubmitForm } from "../hooks/useSubmitForm";
 import FormField from "./FormField";
 
 const RegisterComponent = () => {
   const username = useFormInput("");
   const password = useFormInput("");
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState("");
+  const { submitting, message, handleSubmit } = useSubmitForm();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setSubmitting(true);
+  const onRegister = async () => {
+    // TODO: Implement the registration logic, likely involving an API call
+    // This function should return an object with a 'message' field on success or throw an Error on failure
   };
 
   return (
     <div>
       <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(onRegister);
+        }}
+      >
         <FormField label="Username" type="text" {...username} />
         <FormField label="Password" type="password" {...password} />
         <button type="submit" disabled={submitting}>
