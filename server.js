@@ -2,6 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { body, validationResult } = require("express-validator");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
@@ -21,8 +26,9 @@ db.once("open", function () {
 // Existing User Schema
 const userSchema = new mongoose.Schema({
   name: String,
-  // Add any new fields you need for your project
+  password: String,
 });
+
 const User = mongoose.model("User", userSchema);
 
 // New Workout Schema
@@ -47,6 +53,39 @@ const goalSchema = new mongoose.Schema({
   target: Number,
 });
 const Goal = mongoose.model("Goal", goalSchema);
+
+// Passport.js Configuration
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    const user = await User.findOne({ name: username });
+    if (!user || !bcrypt.compareSync(password, user.password)) {
+      return done(null, false, { message: "Incorrect username or password." });
+    }
+    return done(null, user);
+  })
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
+
+// User Sessions
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // CRUD Operations for Workouts
 app.get("/workouts", async (req, res) => {
@@ -285,6 +324,30 @@ app.post("/api/users", async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
+});
+
+// Authentication Routes
+// Registration
+app.post("/api/users/register", async (req, res) => {
+  try {
+    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+    const newUser = new User({ name: req.body.name, password: hashedPassword });
+    await newUser.save();
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+// Login
+app.post("/api/users/login", passport.authenticate("local"), (req, res) => {
+  res.json({ message: "Logged in successfully" });
+});
+
+// Logout
+app.get("/api/users/logout", (req, res) => {
+  req.logout();
+  res.json({ message: "Logged out successfully" });
 });
 
 // Server setup
