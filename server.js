@@ -7,6 +7,9 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const https = require("https");
+const fs = require("fs");
 
 const app = express();
 app.use(cors());
@@ -29,7 +32,6 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
-
 const User = mongoose.model("User", userSchema);
 
 // New Workout Schema
@@ -37,21 +39,22 @@ const workoutSchema = new mongoose.Schema({
   type: String,
   duration: Number,
   calories_burned: Number,
+  posted_by: mongoose.Schema.Types.ObjectId, // New field
 });
 const Workout = mongoose.model("Workout", workoutSchema);
 
-// New Nutrition Schema
 const nutritionSchema = new mongoose.Schema({
   meal: String,
   calories: Number,
   protein: Number,
+  posted_by: mongoose.Schema.Types.ObjectId, // New field
 });
 const Nutrition = mongoose.model("Nutrition", nutritionSchema);
 
-// New Goal Schema
 const goalSchema = new mongoose.Schema({
   goal_type: String,
   target: Number,
+  posted_by: mongoose.Schema.Types.ObjectId, // New field
 });
 const Goal = mongoose.model("Goal", goalSchema);
 
@@ -88,6 +91,21 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Middleware to validate JWT and protect routes
+app.use((req, res, next) => {
+  if (!req.headers.authorization) {
+    return next(); // If there's no token, skip
+  }
+  const token = req.headers.authorization.split(" ")[1]; // Get the token from the header
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Unauthorized access." });
+    }
+    req.user = decoded; // Set the user in the request object
+    next();
+  });
+});
+
 // CRUD Operations for Workouts
 app.get("/workouts", async (req, res) => {
   try {
@@ -98,6 +116,7 @@ app.get("/workouts", async (req, res) => {
   }
 });
 
+// Example of a protected route that requires JWT
 app.post(
   "/workouts",
   [
@@ -106,11 +125,18 @@ app.post(
     body("calories_burned").isNumeric(),
   ],
   async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const workout = new Workout(req.body);
+
+    const workout = new Workout({
+      ...req.body,
+      posted_by: req.user._id, // Set the user ID from JWT
+    });
+
     try {
       await workout.save();
       res.status(201).json(workout);
@@ -166,7 +192,7 @@ app.delete("/workouts/:id", async (req, res) => {
 // CRUD Operations for Nutrition
 app.get("/nutrition", async (req, res) => {
   try {
-    const nutritionEntries = await Nutrition.find();
+    const nutritionEntries = await Nutrition.find({ posted_by: req.user._id });
     res.json(nutritionEntries);
   } catch (error) {
     res.status(500).send(error);
@@ -181,11 +207,18 @@ app.post(
     body("protein").isNumeric(),
   ],
   async (req, res) => {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const nutritionEntry = new Nutrition(req.body);
+
+    const nutritionEntry = new Nutrition({
+      ...req.body,
+      posted_by: req.user._id, // Set the user ID from JWT
+    });
+
     try {
       await nutritionEntry.save();
       res.status(201).json(nutritionEntry);
@@ -210,15 +243,21 @@ app.put(
     }
 
     try {
-      const updatedNutrition = await Nutrition.findByIdAndUpdate(
-        req.params.id,
+      const nutritionEntry = await Nutrition.findOneAndUpdate(
+        {
+          _id: req.params.id,
+          posted_by: req.user._id, // Check if the user is the owner
+        },
         req.body,
         { new: true }
       );
-      if (!updatedNutrition) {
-        return res.status(404).json({ message: "Nutrition entry not found" });
+
+      if (!nutritionEntry) {
+        return res
+          .status(404)
+          .json({ message: "Nutrition entry not found or unauthorized" });
       }
-      res.json(updatedNutrition);
+      res.json(nutritionEntry);
     } catch (error) {
       res.status(500).send(error);
     }
@@ -228,9 +267,15 @@ app.put(
 // Delete a nutrition entry
 app.delete("/nutrition/:id", async (req, res) => {
   try {
-    const nutritionEntry = await Nutrition.findByIdAndDelete(req.params.id);
+    const nutritionEntry = await Nutrition.findOneAndDelete({
+      _id: req.params.id,
+      posted_by: req.user._id, // Check if the user is the owner
+    });
+
     if (!nutritionEntry) {
-      return res.status(404).json({ message: "Nutrition entry not found" });
+      return res
+        .status(404)
+        .json({ message: "Nutrition entry not found or unauthorized" });
     }
     res.json({ message: "Nutrition entry deleted successfully" });
   } catch (error) {
@@ -352,7 +397,17 @@ app.get("/api/users/logout", (req, res) => {
 });
 
 // Server setup
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}/`);
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}/`);
+// });
+
+// HTTPS Configuration
+const httpsOptions = {
+  key: fs.readFileSync("key.pem"),
+  cert: fs.readFileSync("cert.pem"),
+};
+
+https.createServer(httpsOptions, app).listen(PORT, () => {
+  console.log(`HTTPS server running on https://localhost:${PORT}/`);
 });
