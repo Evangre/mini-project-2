@@ -1,4 +1,4 @@
-# Mini-Project 9: Identity Management and Encryption
+# Mini-Project 10: Web Security
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/df7d557610ea4dfcb364/maintainability)](https://codeclimate.com/github/Evangre/Project1NodeBasics/maintainability)
 
@@ -7,18 +7,23 @@
 - **User Authentication**: Implements user registration, login, and logout using Passport.js.
 - **Password Hashing and Salting**: Enhances security by hashing and salting passwords using Bcrypt.js.
 - **Session Management**: Manages user sessions using `express-session` for a seamless user experience.
-- **Mongoose Integration**: Continues to utilize Mongoose for MongoDB object data modeling.
-- **CRUD Operations**: Maintains CRUD operations for workouts, nutrition facts, and goals.
-- **Validation**: Preserves validation on routes using Mongoose and Express-Validator.
+- **Mongoose Integration**: Utilizes Mongoose for MongoDB object data modeling.
+- **CRUD Operations**: Supports CRUD operations for workouts, nutrition facts, and goals, including access control based on user identity.
+- **Validation**: Uses Express-Validator for route validation.
+- **JSON Web Tokens (JWT)**: Incorporates JWT for secure and efficient user authorization.
+- **HTTPS**: Implements HTTPS for secure communication.
+- **CORS**: Enables Cross-Origin Resource Sharing (CORS) for better security and flexibility.
 
 ## How to Run:
 
 ### Environment Setup:
 
-Create a `.env` file in the root directory with the following content (replace `<Your_Secret_Key>` with your actual secret key):
-
-`````env
-SESSION_SECRET=<Your_Secret_Key>
+1. Create a `.env` file in the root directory with the following content:
+   ```env
+   SESSION_SECRET=<Your_Session_Secret>
+   JWT_SECRET=<Your_JWT_Secret>
+   Replace <Your_Session_Secret> and <Your_JWT_Secret> with your actual secrets.
+   ```
 
 ### MongoDB:
 
@@ -34,7 +39,7 @@ brew services start mongodb-community@7.0
 2. Install dependencies (if not done previously):
    ```shell
    npm install
-`````
+````
 
 3. Start the server using the command:
    ```shell
